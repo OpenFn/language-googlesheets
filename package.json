@@ -1,7 +1,7 @@
 {
-  "name": "language-http",
-  "version": "0.4.0",
-  "description": "An HTTP Language Pack for OpenFn",
+  "name": "language-googlesheets",
+  "version": "0.1.0",
+  "description": "A Google Sheets Language Pack for OpenFn",
   "main": "lib/index.js",
   "scripts": {
     "build": "make",
