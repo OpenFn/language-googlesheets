@@ -1,6 +1,11 @@
-import { execute as commonExecute, expandReferences } from 'language-common';
+import {
+  execute as commonExecute,
+  expandReferences
+} from 'language-common';
 import request from 'request';
-import { resolve as resolveUrl } from 'url';
+import {
+  resolve as resolveUrl
+} from 'url';
 
 /** @module Adaptor */
 
@@ -23,7 +28,9 @@ export function execute(...operations) {
   }
 
   return state => {
-    return commonExecute(...operations)({ ...initialState, ...state })
+    return commonExecute(...operations)({ ...initialState,
+      ...state
+    })
   };
 
 }
@@ -39,28 +46,41 @@ export function execute(...operations) {
  * @param {object} params - data to write to the row
  * @returns {Operation}
  */
-export function postData(params) {
+export function addRow(params) {
 
   return state => {
 
-    function assembleError({ response, error }) {
-      if (response && ([200,201,202].indexOf(response.statusCode) > -1)) return false;
+    function assembleError({
+      response,
+      error
+    }) {
+      if (response && ([200, 201, 202].indexOf(response.statusCode) > -1)) return false;
       if (error) return error;
       return new Error(`Server responded with ${response.statusCode}`)
     }
 
-    const { url, body, headers } = expandReferences(params)(state);
+    const {
+      spreadsheet_id,
+      values
+    } = expandReferences(params)(state);
+
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet_id}/values/range:append?valueInputOption=valueInputOption`
 
     return new Promise((resolve, reject) => {
       console.log("Request body:");
-      console.log("\n" + JSON.stringify(body, null, 4) + "\n");
-      request.post ({
-        url: url,
-        json: body,
-        headers
-      }, function(error, response, body){
-        error = assembleError({error, response})
-        if(error) {
+      console.log("\n" + JSON.stringify(values, null, 4) + "\n");
+      request.post({
+        'url': url,
+        'json': values,
+        'auth': {
+          'bearer': state.idToken
+        }
+      }, function(error, response, body) {
+        error = assembleError({
+          error,
+          response
+        })
+        if (error) {
           reject(error);
           console.log(response);
         } else {
@@ -71,7 +91,11 @@ export function postData(params) {
         }
       })
     }).then((data) => {
-      const nextState = { ...state, response: { body: data } };
+      const nextState = { ...state,
+        response: {
+          body: data
+        }
+      };
       return nextState;
     })
 
@@ -80,6 +104,14 @@ export function postData(params) {
 }
 
 export {
-  field, fields, sourceValue, alterState, each,
-  merge, dataPath, dataValue, lastReferenceValue
-} from 'language-common';
+  field,
+  fields,
+  sourceValue,
+  alterState,
+  each,
+  merge,
+  dataPath,
+  dataValue,
+  lastReferenceValue
+}
+from 'language-common';
