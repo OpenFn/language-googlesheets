@@ -66,6 +66,8 @@ export function addRow(params) {
 
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheet_id}/values/range:append?valueInputOption=valueInputOption`
 
+    const { name, idToken, picture, sheetUrl, expiresIn, tokenType, accessToken, refreshToken } = state.configuration;
+
     return new Promise((resolve, reject) => {
       console.log("Request body:");
       console.log("\n" + JSON.stringify(values, null, 4) + "\n");
@@ -73,7 +75,7 @@ export function addRow(params) {
         'url': url,
         'json': values,
         'auth': {
-          'bearer': state.idToken
+          'bearer': accessToken
         }
       }, function(error, response, body) {
         error = assembleError({
