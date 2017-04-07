@@ -207,69 +207,6 @@ export function listMajors(auth) {
   });
 };
 
-/**
- * Write a new row to a google sheets table
- * @example
- * execute(
- *   appendValues(table, params)
- * )(state)
- * @constructor
- * @param {string} table - the table identifier
- * @param {object} params - data to write to the row
- * @returns {Operation}
- */
-export function addRow(params) {
-
-  return state => {
-
-    function assembleError({
-      response,
-      error
-    }) {
-      if (response && ([200, 201, 202].indexOf(response.statusCode) > -1)) return false;
-      if (error) return error;
-      return new Error(`Server responded with ${response.statusCode}`)
-    }
-
-
-
-    return new Promise((resolve, reject) => {
-      console.log("Request body:");
-      console.log("\n" + JSON.stringify(values, null, 4) + "\n");
-      request.post({
-        'url': url,
-        'json': values,
-        'auth': {
-          'bearer': accessToken
-        }
-      }, function(error, response, body) {
-        error = assembleError({
-          error,
-          response
-        })
-        if (error) {
-          reject(error);
-          console.log(response);
-        } else {
-          console.log("Printing response...\n");
-          console.log(JSON.stringify(response, null, 4) + "\n");
-          console.log("POST succeeded.");
-          resolve(body);
-        }
-      })
-    }).then((data) => {
-      const nextState = { ...state,
-        response: {
-          body: data
-        }
-      };
-      return nextState;
-    })
-
-  }
-
-}
-
 export {
   field,
   fields,
