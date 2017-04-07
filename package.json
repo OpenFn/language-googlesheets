@@ -15,7 +15,9 @@
   ],
   "dependencies": {
     "language-common": "github:openfn/language-common#v0.0.5",
-    "request": "^2.72.0"
+    "request": "^2.72.0",
+    "google-auth-library": "0.9.8",
+    "googleapis": "14.0.0"
   },
   "devDependencies": {
     "assertion-error": "^1.0.1",
