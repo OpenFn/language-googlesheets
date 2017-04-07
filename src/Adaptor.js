@@ -134,8 +134,8 @@ function storeToken(token) {
 }
 
 const values = [
-  ["Romain", "$15", "2", "3/15/2016"],
-  ["New Shit!!!", "$100", "1", "3/20/2016"],
+  ["Taylor", "$15", "2", "3/15/2016"],
+  ["Moar New Stuff!!!", "$100", "1", "3/20/2016"]
 ];
 
 /**
