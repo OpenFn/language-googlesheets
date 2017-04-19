@@ -19,21 +19,18 @@ appendValues({
 });
 ```
 
-
 #### sample configuration
 This is generated automatically via OpenFn.org
 ```json
-{
-  "access_token": "secret",
-  "refresh_token": "nope",
-  "token_type": "Bearer",
-  "expiry_date": 1491501851769,
+"configuration": {
   "name": "Taylor Downs",
-  "idToken": "something",
-  "picture": "https://lh6.googleusercontent.com/-asdfghjkl/aaa/uhhh/this_photo/photo.jpg",
-  "sheetUrl": "https://docs.google.com/spreadsheets/d/muhahahahaha",
+  "idToken": "muhaha",
+  "picture": "https://lh6.googleusercontent.com/some/photo.jpg",
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/mySheet-id/edit#gid=0",
   "expiresIn": 3600,
-  "tokenType": "Bearer"
+  "tokenType": "Bearer",
+  "accessToken": "nu-uh",
+  "refreshToken": "no way!"
 }
 ```
 
