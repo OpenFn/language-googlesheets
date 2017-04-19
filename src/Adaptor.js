@@ -8,6 +8,13 @@ var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
 
+// If modifying these scopes, delete your previously saved credentials
+// at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
+var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
+    process.env.USERPROFILE) + '/.credentials/';
+var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
+
 /** @module Adaptor */
 
 /**
@@ -29,34 +36,65 @@ export function execute(...operations) {
     data: null
   }
 
-  return state => {
+  // why not here?
 
+  return state => {
     // Note: we no longer need `steps` anymore since `commonExecute`
     // takes each operation as an argument.
     return commonExecute(
-      fs.readFile('client_secret.json', function processClientSecrets(err, content) {
-        if (err) {
-          console.log('Error loading client secret file: ' + err);
-          return;
-        }
-        authorize(JSON.parse(content), appendValues);
-      }),
-      /**
-        * I want to return the result of authorize (and "auth" object)
-        * and then pass it to every operation....
-        */
-      ...flatten(operations)
+      function(state) {
+        return readFile('client_secret.json').then((fileData) => {
+          // console.log(JSON.parse(fileData));
+          return authorize(JSON.parse(fileData))(state)
+        })
+      },
+      function(state) {
+        console.log(state);
+        return state
+      },
+      ...operations
     )({ ...initialState, ...state })
   };
 
 }
 
-// If modifying these scopes, delete your previously saved credentials
-// at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
-var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
-var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-    process.env.USERPROFILE) + '/.credentials/';
-var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
+/**
+ * Add an array of rows to the spreadsheet.
+ * https://developers.google.com/sheets/api/samples/writing#append_values
+ */
+export function appendValues(params) {
+
+  return state => {
+
+    const { spreadsheetId, range, values } = expandReferences(params)(state);
+
+    var sheets = google.sheets('v4');
+
+    return new Promise((resolve, reject) => {
+     sheets.spreadsheets.values.append({
+       auth: state.auth,
+       spreadsheetId,
+       range,
+       valueInputOption: 'USER_ENTERED',
+       resource: {
+         range,
+         "majorDimension": "ROWS",
+         values: values,
+       }
+     }, function(err, response) {
+       if (err) {
+         console.log('The API returned an error: ' + err);
+         reject(err);
+       } else {
+         console.log('Well done, homie. Here is the response:')
+         console.log(response);
+         resolve(state);
+       }
+     })
+    })
+   }
+
+};
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -65,23 +103,43 @@ var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
-  var clientSecret = credentials.installed.client_secret;
-  var clientId = credentials.installed.client_id;
-  var redirectUrl = credentials.installed.redirect_uris[0];
-  var auth = new googleAuth();
-  var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+function authorize(credentials) {
 
-  // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, function(err, token) {
-    if (err) {
-      getNewToken(oauth2Client, callback);
-    } else {
-      oauth2Client.credentials = JSON.parse(token);
-      callback(oauth2Client);
-    }
-  });
-}
+  return state => {
+
+    var clientSecret = credentials.installed.client_secret;
+    var clientId = credentials.installed.client_id;
+    var redirectUrl = credentials.installed.redirect_uris[0];
+    var auth = new googleAuth();
+    var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+    var tokenPath = TOKEN_PATH
+
+    return readFile(tokenPath)
+      .then(token => {
+        if (!token) {
+          return getNewToken().then((token) => {
+            return { ...state, auth: oauth2Client }
+          })
+        } else {
+          oauth2Client.credentials = JSON.parse(token);
+          return { ...state, auth: oauth2Client }
+        }
+      })
+  }
+
+};
+
+function readFile(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, function(err, data) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    })
+  })
+};
 
 /**
  * Get and store new token after prompting for user authorization, and then
@@ -103,7 +161,7 @@ function getNewToken(oauth2Client, callback) {
   });
   rl.question('Enter the code from that page here: ', function(code) {
     rl.close();
-    // TODO: CODE is the refresh token....
+    // 'code' is the refresh token....
     oauth2Client.getToken(code, function(err, token) {
       if (err) {
         console.log('Error while trying to retrieve access token', err);
@@ -132,80 +190,6 @@ function storeToken(token) {
   fs.writeFile(TOKEN_PATH, JSON.stringify(token));
   console.log('Token stored to ' + TOKEN_PATH);
 }
-
-const values = [
-  ["Taylor", "$15", "2", "3/15/2016"],
-  ["Moar New Stuff!!!", "$100", "1", "3/20/2016"]
-];
-
-/**
- * Add an array of rows to the spreadsheet.
- * https://developers.google.com/sheets/api/samples/writing#append_values
- */
-export function appendValues(auth, params) {
-
-  /**
-   * TODO: Get spreadsheet_id, range, and values array from the expression.
-   */
-  // const {
-  //   spreadsheet_id,
-  //   values
-  // } = expandReferences(params)(state);
-  //
-  // const { name, idToken, picture, sheetUrl, expiresIn,
-  //         tokenType, accessToken, refreshToken } = state.configuration;
-
-
-  var sheets = google.sheets('v4');
-  sheets.spreadsheets.values.append({
-    auth: auth,
-    spreadsheetId: '1O-a4_RgPF_p8W3I6b5M9wobA3-CBW8hLClZfUik5sos',
-    range: 'Sheet1!A1:E1',
-    valueInputOption: 'USER_ENTERED',
-    resource: {
-      "range": "Sheet1!A1:E1",
-      "majorDimension": "ROWS",
-      values: values,
-    }
-  }, function(err, response) {
-    if (err) {
-      console.log('The API returned an error: ' + err);
-      return;
-    } else {
-      console.log('Well done, homie. Here is the response:')
-      console.log(response);
-    }
-  });
-};
-
-/**
- * Print the names and majors of students in a sample spreadsheet:
- * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
- */
-export function listMajors(auth) {
-  var sheets = google.sheets('v4');
-  sheets.spreadsheets.values.get({
-    auth: auth,
-    spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-    range: 'Class Data!A2:E',
-  }, function(err, response) {
-    if (err) {
-      console.log('The API returned an error: ' + err);
-      return;
-    }
-    var rows = response.values;
-    if (rows.length == 0) {
-      console.log('No data found.');
-    } else {
-      console.log('Name, Major:');
-      for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        // Print columns A and E, which correspond to indices 0 and 4.
-        console.log('%s, %s', row[0], row[4]);
-      }
-    }
-  });
-};
 
 export {
   field,
