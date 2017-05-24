@@ -10,10 +10,10 @@ var googleAuth = require('google-auth-library');
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/sheets.googleapis.com-nodejs-quickstart.json
-var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
-var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-    process.env.USERPROFILE) + '/.credentials/';
-var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
+// var SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
+// var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
+//     process.env.USERPROFILE) + '/.credentials/';
+// var TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
 
 /** @module Adaptor */
 
@@ -48,7 +48,7 @@ export function execute(...operations) {
           return authorize(JSON.parse(fileData))(state)
         })
       },
-      function(state) {
+      state => {
         console.log(state);
         return state
       },
@@ -66,13 +66,27 @@ export function appendValues(params) {
 
   return state => {
 
+    const { accessToken, refreshToken } = state.configuration;
+
+    console.log(state.auth)
+
+    var OAuth2 = google.auth.OAuth2;
+
+    var oauth2Client = new OAuth2(
+      "YOUR_CLIENT_ID",
+      "YOUR_CLIENT_SECRET",
+      "YOUR_REDIRECT_URL"
+    );
+
+    oauth2Client.credentials = { access_token: accessToken };
+
     const { spreadsheetId, range, values } = expandReferences(params)(state);
 
     var sheets = google.sheets('v4');
 
     return new Promise((resolve, reject) => {
      sheets.spreadsheets.values.append({
-       auth: state.auth,
+       auth: oauth2Client,
        spreadsheetId,
        range,
        valueInputOption: 'USER_ENTERED',
@@ -112,19 +126,28 @@ function authorize(credentials) {
     var redirectUrl = credentials.installed.redirect_uris[0];
     var auth = new googleAuth();
     var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
-    var tokenPath = TOKEN_PATH
 
-    return readFile(tokenPath)
-      .then(token => {
-        if (!token) {
-          return getNewToken().then((token) => {
-            return { ...state, auth: oauth2Client }
-          })
-        } else {
-          oauth2Client.credentials = JSON.parse(token);
+    var token = {
+      "access_token": state.configuration.accessToken,
+      "refresh_token": state.configuration.refreshToken,
+      "token_type": state.configuration.tokenType,
+      "expires_in": state.configuration.expiresIn
+    };
+
+    // var tokenPath = TOKEN_PATH
+
+    // return readFile(tokenPath)
+      // .then(token => {
+        // if (!token) {
+          // return getNewToken().then((token) => {
+            // return { ...state, auth: oauth2Client }
+          // })
+        // } else {
+          // oauth2Client.credentials = JSON.parse(token);
+          oauth2Client.credentials = token;
           return { ...state, auth: oauth2Client }
-        }
-      })
+        // }
+      // })
   }
 
 };
