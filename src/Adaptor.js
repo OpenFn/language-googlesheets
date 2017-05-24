@@ -68,10 +68,11 @@ export function appendValues(params) {
        }
      }, function(err, response) {
        if (err) {
-         console.log('The API returned an error: ' + err);
+         console.log('The API returned an error:');
+         console.log(err);
          reject(err);
        } else {
-         console.log('Well done, homie. Here is the response:')
+         console.log('Success! Here is the response from Google:')
          console.log(response);
          resolve(state);
        }
