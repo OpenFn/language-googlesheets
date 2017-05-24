@@ -42,12 +42,12 @@ export function execute(...operations) {
     // Note: we no longer need `steps` anymore since `commonExecute`
     // takes each operation as an argument.
     return commonExecute(
-      function(state) {
-        return readFile('client_secret.json').then((fileData) => {
-          // console.log(JSON.parse(fileData));
-          return authorize(JSON.parse(fileData))(state)
-        })
-      },
+      // function(state) {
+      //   return readFile('client_secret.json').then((fileData) => {
+      //     // console.log(JSON.parse(fileData));
+      //     return authorize(JSON.parse(fileData))(state)
+      //   })
+      // },
       state => {
         console.log(state);
         return state
@@ -72,12 +72,7 @@ export function appendValues(params) {
 
     var OAuth2 = google.auth.OAuth2;
 
-    var oauth2Client = new OAuth2(
-      "YOUR_CLIENT_ID",
-      "YOUR_CLIENT_SECRET",
-      "YOUR_REDIRECT_URL"
-    );
-
+    var oauth2Client = new OAuth2();
     oauth2Client.credentials = { access_token: accessToken };
 
     const { spreadsheetId, range, values } = expandReferences(params)(state);
