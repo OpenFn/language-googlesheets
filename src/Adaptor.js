@@ -2,7 +2,7 @@ import { execute as commonExecute, expandReferences } from 'language-common';
 import request from 'request';
 import { resolve as resolveUrl } from 'url';
 import { curry, mapValues, flatten } from 'lodash-fp';
-import google from 'googleapis';
+import { google } from 'googleapis';
 
 /** @module Adaptor */
 
@@ -19,22 +19,18 @@ import google from 'googleapis';
  * @returns {Operation}
  */
 export function execute(...operations) {
-
   const initialState = {
     references: [],
-    data: null
-  }
+    data: null,
+  };
 
   // why not here?
 
-  return state => {
+  return (state) => {
     // Note: we no longer need `steps` anymore since `commonExecute`
     // takes each operation as an argument.
-    return commonExecute(
-      ...operations
-    )({ ...initialState, ...state })
+    return commonExecute(...operations)({ ...initialState, ...state });
   };
-
 }
 
 /**
@@ -42,45 +38,44 @@ export function execute(...operations) {
  * https://developers.google.com/sheets/api/samples/writing#append_values
  */
 export function appendValues(params) {
-
-  return state => {
-
+  return (state) => {
     const { accessToken } = state.configuration;
 
-    var OAuth2 = google.auth.OAuth2;
-    var oauth2Client = new OAuth2();
-        oauth2Client.credentials = { access_token: accessToken };
+    const oauth2Client = new google.auth.OAuth2();
+    oauth2Client.credentials = { access_token: accessToken };
 
     const { spreadsheetId, range, values } = expandReferences(params)(state);
 
     var sheets = google.sheets('v4');
 
     return new Promise((resolve, reject) => {
-     sheets.spreadsheets.values.append({
-       auth: oauth2Client,
-       spreadsheetId,
-       range,
-       valueInputOption: 'USER_ENTERED',
-       resource: {
-         range,
-         "majorDimension": "ROWS",
-         values: values,
-       }
-     }, function(err, response) {
-       if (err) {
-         console.log('The API returned an error:');
-         console.log(err);
-         reject(err);
-       } else {
-         console.log('Success! Here is the response from Google:')
-         console.log(response);
-         resolve(state);
-       }
-     })
-    })
-   }
-
-};
+      sheets.spreadsheets.values.append(
+        {
+          auth: oauth2Client,
+          spreadsheetId,
+          range,
+          valueInputOption: 'USER_ENTERED',
+          resource: {
+            range,
+            majorDimension: 'ROWS',
+            values: values,
+          },
+        },
+        function (err, response) {
+          if (err) {
+            console.log('The API returned an error:');
+            console.log(err);
+            reject(err);
+          } else {
+            console.log('Success! Here is the response from Google:');
+            console.log(response);
+            resolve(state);
+          }
+        }
+      );
+    });
+  };
+}
 
 export {
   field,
@@ -91,6 +86,5 @@ export {
   merge,
   dataPath,
   dataValue,
-  lastReferenceValue
-}
-from 'language-common';
+  lastReferenceValue,
+} from 'language-common';
