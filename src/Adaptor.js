@@ -36,9 +36,6 @@ export function execute(...operations) {
 /**
  * Add an array of rows to the spreadsheet.
  * https://developers.google.com/sheets/api/samples/writing#append_values
- */
-/**
- * Add an array of rows to the spreadsheet.
  * @example
  * execute(
  *   appendValues(params)
