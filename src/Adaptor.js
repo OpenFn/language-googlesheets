@@ -1,7 +1,7 @@
-import { execute as commonExecute, expandReferences } from 'language-common';
-import request from 'request';
-import { resolve as resolveUrl } from 'url';
-import { curry, mapValues, flatten } from 'lodash-fp';
+import {
+  execute as commonExecute,
+  expandReferences,
+} from '@openfn/language-common';
 import { google } from 'googleapis';
 
 /** @module Adaptor */
@@ -26,7 +26,7 @@ export function execute(...operations) {
 
   // why not here?
 
-  return (state) => {
+  return state => {
     // Note: we no longer need `steps` anymore since `commonExecute`
     // takes each operation as an argument.
     return commonExecute(...operations)({ ...initialState, ...state });
@@ -37,8 +37,18 @@ export function execute(...operations) {
  * Add an array of rows to the spreadsheet.
  * https://developers.google.com/sheets/api/samples/writing#append_values
  */
+/**
+ * Add an array of rows to the spreadsheet.
+ * @example
+ * execute(
+ *   appendValues(params)
+ * )(state)
+ * @constructor
+ * @param {Object} params - Data object to add to the spreadsheet.
+ * @returns {Operation}
+ */
 export function appendValues(params) {
-  return (state) => {
+  return state => {
     const { accessToken } = state.configuration;
 
     const oauth2Client = new google.auth.OAuth2();
@@ -78,13 +88,15 @@ export function appendValues(params) {
 }
 
 export {
-  field,
-  fields,
-  sourceValue,
   alterState,
-  each,
-  merge,
+  combine,
   dataPath,
   dataValue,
+  each,
+  field,
+  fields,
+  http,
   lastReferenceValue,
-} from 'language-common';
+  merge,
+  sourceValue,
+} from '@openfn/language-common';
