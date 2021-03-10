@@ -1,6 +1,6 @@
 {
   "name": "@openfn/language-googlesheets",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Google Sheets Language Pack for OpenFn",
   "homepage": "https://docs.openfn.org",
   "repository": {
@@ -19,7 +19,7 @@
     "lib/"
   ],
   "dependencies": {
-    "@openfn/language-common": "1.2.6",
+    "@openfn/language-common": "1.2.8",
     "google-auth-library": "^2.0.0",
     "googleapis": "34.0.0",
     "request": "^2.72.0"
@@ -31,8 +31,8 @@
     "@babel/register": "^7.9.0",
     "assertion-error": "^1.0.1",
     "chai": "^4.2.0",
-    "jsdoc": "^3.6.6",
     "deep-eql": "^4.0.0",
+    "jsdoc": "^3.6.6",
     "mocha": "^7.1.0",
     "nock": "^13.0.5",
     "sinon": "^9.2.3"
