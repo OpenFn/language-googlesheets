@@ -9,14 +9,18 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "build": "make",
-    "test": "mocha --compilers js:babel-core/register",
-    "test:watch": "mocha -w --compilers js:babel-core/register"
+    "ast": "simple-ast --adaptor ./src/Adaptor.js --output ast.json",
+    "build": "node_modules/.bin/babel src -d lib && npm run ast",
+    "postversion": "git push && git push --tags",
+    "test": "mocha --require @babel/register",
+    "test:watch": "mocha -w --require @babel/register",
+    "version": "npm run build && git add -A lib ast.json"
   },
   "author": "Open Function Group",
   "license": "LGPLv3",
   "files": [
-    "lib/"
+    "lib/",
+    "ast.json"
   ],
   "dependencies": {
     "@openfn/language-common": "1.2.8",
@@ -29,12 +33,22 @@
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
     "@babel/register": "^7.9.0",
+    "@openfn/simple-ast": "^0.4.1",
     "assertion-error": "^1.0.1",
     "chai": "^4.2.0",
     "deep-eql": "^4.0.0",
-    "jsdoc": "^3.6.6",
+    "jsdoc": "^3.6.10",
     "mocha": "^7.1.0",
     "nock": "^13.0.5",
     "sinon": "^9.2.3"
-  }
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "bundledDependencies": [
+    "@openfn/language-common",
+    "google-auth-library",
+    "googleapis",
+    "request"
+  ]
 }
