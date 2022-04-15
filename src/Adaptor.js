@@ -1,8 +1,8 @@
 import {
   execute as commonExecute,
   expandReferences,
-} from '@openfn/language-common';
-import { google } from 'googleapis';
+} from "@openfn/language-common";
+import { google } from "googleapis";
 
 /** @module Adaptor */
 
@@ -26,7 +26,7 @@ export function execute(...operations) {
 
   // why not here?
 
-  return state => {
+  return (state) => {
     // Note: we no longer need `steps` anymore since `commonExecute`
     // takes each operation as an argument.
     return commonExecute(...operations)({ ...initialState, ...state });
@@ -51,7 +51,7 @@ export function execute(...operations) {
  * @returns {Operation}
  */
 export function appendValues(params) {
-  return state => {
+  return (state) => {
     const { accessToken } = state.configuration;
 
     const oauth2Client = new google.auth.OAuth2();
@@ -59,7 +59,7 @@ export function appendValues(params) {
 
     const { spreadsheetId, range, values } = expandReferences(params)(state);
 
-    var sheets = google.sheets('v4');
+    var sheets = google.sheets("v4");
 
     return new Promise((resolve, reject) => {
       sheets.spreadsheets.values.append(
@@ -67,20 +67,20 @@ export function appendValues(params) {
           auth: oauth2Client,
           spreadsheetId,
           range,
-          valueInputOption: 'USER_ENTERED',
+          valueInputOption: "USER_ENTERED",
           resource: {
             range,
-            majorDimension: 'ROWS',
+            majorDimension: "ROWS",
             values: values,
           },
         },
         function (err, response) {
           if (err) {
-            console.log('The API returned an error:');
+            console.log("The API returned an error:");
             console.log(err);
             reject(err);
           } else {
-            console.log('Success! Here is the response from Google:');
+            console.log("Success! Here is the response from Google:");
             console.log(response);
             resolve(state);
           }
@@ -98,8 +98,9 @@ export {
   each,
   field,
   fields,
+  fn,
   http,
   lastReferenceValue,
   merge,
   sourceValue,
-} from '@openfn/language-common';
+} from "@openfn/language-common";

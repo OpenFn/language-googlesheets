@@ -23,14 +23,12 @@
     "ast.json"
   ],
   "dependencies": {
-    "@openfn/language-common": "1.2.8",
-    "google-auth-library": "^2.0.0",
-    "googleapis": "34.0.0",
-    "request": "^2.72.0"
+    "@openfn/language-common": "1.7.1",
+    "googleapis": "100.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.10",
-    "@babel/core": "^7.9.0",
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
     "@babel/preset-env": "^7.9.5",
     "@babel/register": "^7.9.0",
     "@openfn/simple-ast": "^0.4.1",
@@ -38,7 +36,7 @@
     "chai": "^4.2.0",
     "deep-eql": "^4.0.0",
     "jsdoc": "^3.6.10",
-    "mocha": "^7.1.0",
+    "mocha": "^9.2.2",
     "nock": "^13.0.5",
     "sinon": "^9.2.3"
   },
@@ -47,8 +45,6 @@
   },
   "bundledDependencies": [
     "@openfn/language-common",
-    "google-auth-library",
-    "googleapis",
-    "request"
+    "googleapis"
   ]
 }
