@@ -7,18 +7,9 @@ calls.
 
 ### sample configuration
 
-This is generated automatically via OpenFn.org
-
 ```json
-"configuration": {
-  "name": "Taylor Downs",
-  "idToken": "muhaha",
-  "picture": "https://lh6.googleusercontent.com/some/photo.jpg",
-  "sheetUrl": "https://docs.google.com/spreadsheets/d/mySheet-id/edit#gid=0",
-  "expiresIn": 3600,
-  "tokenType": "Bearer",
-  "accessToken": "nu-uh",
-  "refreshToken": "no way!"
+{
+  "accessToken": "nu-uh"
 }
 ```
 
