@@ -1,4 +1,9 @@
-# Language Google Sheets [![Build Status](https://travis-ci.org/OpenFn/language-googlesheets.svg?branch=master)](https://travis-ci.org/OpenFn/language-googlesheets)
+# _⚠️ MOVED TO [OpenFn/adaptors](https://github.com/OpenFn/adaptors)! ⚠️_
+
+**N.B.: New versions are available at:
+https://github.com/OpenFn/adaptors/tree/main/packages/googlesheets**
+
+# Language Google Sheets (Archived)
 
 Language Pack for building expressions and operations to make Google Sheets API
 calls.
@@ -20,11 +25,11 @@ Add rows to an existing sheet:
 
 ```js
 appendValues({
-  spreadsheetId: '1O-a4_RgPF_p8W3I6b5M9wobA3-CBW8hLClZfUik5sos',
-  range: 'Sheet1!A1:E1',
+  spreadsheetId: "1O-a4_RgPF_p8W3I6b5M9wobA3-CBW8hLClZfUik5sos",
+  range: "Sheet1!A1:E1",
   values: [
-    ['From expression', '$15', '2', '3/15/2016'],
-    ['Really now!', '$100', '1', '3/20/2016'],
+    ["From expression", "$15", "2", "3/15/2016"],
+    ["Really now!", "$100", "1", "3/20/2016"],
   ],
 });
 ```
